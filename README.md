@@ -1,36 +1,79 @@
-# Projeto: C-chat
-## Chat em Grupo em linguagem C 
+# C-Chat
 
-Este projeto implementa um sistema simples de chat em grupo utilizando a linguagem C e a API Winsock para comunicação em rede no ambiente Windows. Ele segue o modelo cliente-servidor, permitindo que múltiplos clientes se conectem a um servidor central para trocar mensagens em tempo real.
+## Descrição
 
-## Arquitetura
-
-O sistema é composto por dois componentes principais:
-
-1.  **Servidor (`server.c`)**: 
-    *   Aguarda conexões de clientes em uma porta específica (padrão: 8080).
-    *   Utiliza TCP/IP para comunicação confiável.
-    *   Gerencia múltiplos clientes simultaneamente usando threads (uma thread por cliente).
-    *   Recebe mensagens de um cliente e as retransmite (broadcast) para todos os outros clientes conectados.
-    *   Notifica os clientes quando um novo usuário entra ou sai do chat.
-    
-
-2.  **Cliente (`client.c`)**: 
-    *   Conecta-se ao servidor fornecendo o endereço IP e a porta.
-    *   Solicita um nome de usuário ao iniciar.
-    *   Envia mensagens digitadas pelo usuário para o servidor.
-    *   Possui uma thread dedicada para receber mensagens do servidor (mensagens de outros usuários ou notificações do sistema) e exibi-las no console.
-    *   Permite ao usuário desconectar digitando `/quit`.
+C-Chat é uma aplicação simples de bate-papo cliente-servidor baseada em terminal, escrita em C. Ela permite que múltiplos usuários se conectem a um servidor central e troquem mensagens em tempo real através da rede local. A interface utiliza cores e formatação básica no console do Windows.
 
 ## Funcionalidades
 
-*   Chat em grupo com múltiplos usuários.
-*   Comunicação baseada em TCP/IP.
-*   Notificações de entrada e saída de usuários.
-*   Interface de linha de comando simples.
+*   **Chat Multi-Cliente:** Suporta múltiplos clientes conectados simultaneamente.
+*   **Comunicação em Tempo Real:** Mensagens são enviadas e recebidas instantaneamente.
+*   **Interface de Terminal Colorida:** Utiliza cores para diferenciar informações (nomes de usuário, timestamps, mensagens próprias) no console do Windows.
+*   **Comandos Básicos:**
+    *   `/lista`: Lista os usuários atualmente conectados ao chat.
+    *   `/limpar`: Limpa a tela do console do cliente.
+    *   `/sair`: Desconecta o cliente do chat.
+*   **Timestamp:** Exibe o horário em que as mensagens foram enviadas/recebidas.
 
-## Pré-requisitos
+## Tecnologias Utilizadas
 
-*   Sistema Operacional Windows.
-*   Compilador C (como MinGW/GCC ou o compilador do Visual Studio).
-*   Biblioteca Winsock 2 (`ws2_32.lib`) - geralmente incluída com os compiladores para Windows.
+*   **Linguagem:** C
+*   **Rede:** Sockets TCP/IP (utilizando a biblioteca Winsock específica do Windows).
+*   **Interface:** API do Console do Windows para cores, limpeza de tela e obtenção da largura do terminal.
+*   **Concorrência:** Threads do Windows (`CreateThread`) e Seções Críticas (`CRITICAL_SECTION`) para lidar com múltiplos clientes e acesso seguro a dados compartilhados no servidor.
+
+**só pode ser compilado e executado no sistema operacional Windows** na sua forma atual.
+
+## Componentes
+
+1.  **Servidor (`server.c`):**
+    *   Aguarda e aceita conexões de novos clientes.
+    *   Gerencia a lista de clientes conectados.
+    *   Recebe mensagens dos clientes.
+    *   Retransmite (broadcast) as mensagens para todos os outros clientes conectados.
+    *   Processa comandos como `/lista`.
+2.  **Cliente (`client.c`):**
+    *   Conecta-se ao servidor.
+    *   Solicita um nome de usuário.
+    *   Permite ao usuário enviar mensagens e comandos.
+    *   Recebe e exibe mensagens do servidor (de outros usuários ou respostas a comandos) em uma thread separada.
+3.  **Interface do Terminal (`terminal_ui.h`, `terminal_ui.c`):**
+    *   Módulo auxiliar com funções para manipular a aparência do console (cores, linhas, título, limpeza de tela).
+
+
+## Compilação (Windows)
+
+Você precisará de um compilador C para Windows que suporte Winsock, como o MinGW (GCC) ou o Microsoft Visual C++ (MSVC).
+
+**Usando GCC (MinGW):**
+
+1.  **Compilar o Servidor:**
+    ```bash
+    gcc server.c terminal_ui.c -o server.exe -lws2_32
+    ```
+2.  **Compilar o Cliente:**
+    ```bash
+    gcc client.c terminal_ui.c -o client.exe -lws2_32
+    ```
+
+*   A flag `-lws2_32` é essencial para linkar a biblioteca Winsock.
+
+
+## Execução
+
+1.  **Inicie o Servidor:** Abra um terminal (Prompt de Comando ou PowerShell) no diretório onde `server.exe` foi compilado e execute:
+    ```bash
+    ./server.exe
+    ```
+    O servidor exibirá uma mensagem indicando que está aguardando conexões na porta 8080.
+
+2.  **Inicie um ou mais Clientes:** Abra um novo terminal para cada cliente que deseja conectar. Navegue até o diretório onde `client.exe` foi compilado e execute:
+    ```bash
+    ./client.exe
+    ```
+3.  **Uso do Cliente:**
+    *   O cliente solicitará um nome de usuário. Digite o nome desejado e pressione Enter.
+    *   Após conectar, um menu de boas-vindas e comandos será exibido.
+    *   Digite suas mensagens e pressione Enter para enviá-las.
+    *   Mensagens de outros usuários aparecerão no seu console.
+    *   Use os comandos `/lista`, `/limpar` ou `/sair` conforme necessário.

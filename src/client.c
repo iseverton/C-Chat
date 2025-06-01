@@ -21,7 +21,7 @@ void show_menu()
     print_colored("/lista", COLOR_BLUE);
     printf("  -> Listar usuarios ativos\n");
 
-    print_colored("/clean", COLOR_BLUE);
+    print_colored("/limpar", COLOR_BLUE);
     printf("  -> Limpar a tela\n");
 
     print_colored("/sair", COLOR_BLUE);

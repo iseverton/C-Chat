@@ -16,10 +16,10 @@ void show_menu()
 {
     printf("\nBem-vindo, ");
     print_colored(UserName, COLOR_YELLOW);
-    printf("! Comandos disponíveis:\n\n");
+    printf("! Comandos disponiveis:\n\n");
 
     print_colored("/lista", COLOR_BLUE);
-    printf("  -> Listar usuários ativos\n");
+    printf("  -> Listar usuarios ativos\n");
 
     print_colored("/clean", COLOR_BLUE);
     printf("  -> Limpar a tela\n");
@@ -95,7 +95,7 @@ int main()
             if (strlen(send_buffer) == 0)
                 continue;
 
-            if (strcmp(send_buffer, "/clean") == 0)
+            if (strcmp(send_buffer, "/limpar") == 0)
             {
                 clear_console();
                 print_stylish_title();
@@ -130,7 +130,7 @@ int main()
             print_colored("(", COLOR_DARK_GRAY);
             print_colored(time_str, COLOR_DARK_GRAY);
             print_colored(") ", COLOR_DARK_GRAY);
-            print_colored("você", COLOR_YELLOW);
+            print_colored("voce", COLOR_YELLOW);
             printf(": %s\n", send_buffer);
         }
     }
@@ -150,7 +150,7 @@ DWORD WINAPI receive_thread(LPVOID param)
         bytes_received = recv(client_socket, recv_buffer, BUFFER_SIZE - 1, 0);
         if (bytes_received <= 0)
         {
-            printf("Conexão encerrada pelo servidor.\n");
+            printf("Conexao encerrada pelo servidor.\n");
             break;
         }
 

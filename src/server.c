@@ -175,7 +175,7 @@ DWORD WINAPI handle_client(LPVOID client_socket_ptr)
                 char time_str[9];
                 strftime(time_str, sizeof(time_str), "%H:%M:%S", t);
 
-                char formatted_msg[BUFFER_SIZE + 150]; // Aumente o buffer para acomodar os códigos de cores
+                char formatted_msg[BUFFER_SIZE + 150]; // Aumente o buffer para acomodar os codigos de cores
                 snprintf(formatted_msg, sizeof(formatted_msg),
                          "[%s%s%s] %s: %s",
                          ANSI_COLOR_GRAY, time_str, ANSI_COLOR_RESET,

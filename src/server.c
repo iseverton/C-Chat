@@ -28,6 +28,7 @@ void send_active_users(SOCKET requester);
 
 int main()
 {
+    // verifica se a biblioteca inicializou corretamente
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
@@ -37,6 +38,7 @@ int main()
 
     InitializeCriticalSection(&clients_lock);
 
+    // cria o socket do servidor
     SOCKET server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (server_socket == INVALID_SOCKET)
     {
@@ -44,12 +46,14 @@ int main()
         return 1;
     }
 
+    // configura o endereco que vai ser usado pelo socket
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(SERVER_PORT);
     server_addr.sin_addr.s_addr = INADDR_ANY;
     memset(server_addr.sin_zero, 0, 8);
 
+    // associa o endereco ao socket
     if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == SOCKET_ERROR)
     {
         printf("Erro no bind\n");
@@ -58,6 +62,7 @@ int main()
         return 1;
     }
 
+    // socket comeca a escutar as tentativas de conexoes
     if (listen(server_socket, MAX_PENDING_CONNECTIONS) == SOCKET_ERROR)
     {
         printf("Erro ao escutar\n");
@@ -72,6 +77,7 @@ int main()
 
     while (1)
     {
+        // aceita a conexao do cliente e cria um novo socket especifico para aquele cliente
         SOCKET client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_addr_len);
         if (client_socket == INVALID_SOCKET)
         {
@@ -98,7 +104,9 @@ int main()
         }
         LeaveCriticalSection(&clients_lock);
 
+        // cria um thread para lidar com cada cliente
         HANDLE thread = CreateThread(NULL, 0, handle_client, (LPVOID)client_socket, 0, NULL);
+
         if (thread == NULL)
         {
             printf("Erro ao criar thread: %d\n", GetLastError());
@@ -119,6 +127,7 @@ int main()
     return 0;
 }
 
+// recebe mensagens do cliente
 DWORD WINAPI handle_client(LPVOID client_socket_ptr)
 {
     SOCKET client_socket = (SOCKET)client_socket_ptr;
@@ -175,7 +184,7 @@ DWORD WINAPI handle_client(LPVOID client_socket_ptr)
                 char time_str[9];
                 strftime(time_str, sizeof(time_str), "%H:%M:%S", t);
 
-                char formatted_msg[BUFFER_SIZE + 150]; // Aumente o buffer para acomodar os codigos de cores
+                char formatted_msg[BUFFER_SIZE + 150];
                 snprintf(formatted_msg, sizeof(formatted_msg),
                          "[%s%s%s] %s: %s",
                          ANSI_COLOR_GRAY, time_str, ANSI_COLOR_RESET,
@@ -194,6 +203,7 @@ DWORD WINAPI handle_client(LPVOID client_socket_ptr)
     return 0;
 }
 
+// envia a mensagem para todos os clientes conectados, menos para o cliente que enviou a mensagem original
 void broadcast_message(const char *formatted_msg, SOCKET sender)
 {
     EnterCriticalSection(&clients_lock);
@@ -212,6 +222,7 @@ void broadcast_message(const char *formatted_msg, SOCKET sender)
     LeaveCriticalSection(&clients_lock);
 }
 
+// remove o cliente da lista
 void remove_client(SOCKET client_socket)
 {
     for (int i = 0; i < clients_count; i++)
@@ -226,6 +237,7 @@ void remove_client(SOCKET client_socket)
     }
 }
 
+// lista de usuarios conectados
 void send_active_users(SOCKET requester)
 {
     char user_list[BUFFER_SIZE];
